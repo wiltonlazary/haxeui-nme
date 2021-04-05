@@ -150,7 +150,7 @@ class NMEStyleHelper {
         if (borderRadius == 0) {
             graphics.drawRect(rc.left, rc.top, rc.width, rc.height);
         } else {
-            graphics.drawRoundRect(rc.left, rc.top, rc.width, rc.height, borderRadius + 2, borderRadius + 2);
+            graphics.drawRoundRect(rc.left, rc.top, rc.width, rc.height, borderRadius + 1, borderRadius + 1);
         }
 
         graphics.endFill();
@@ -168,11 +168,11 @@ class NMEStyleHelper {
         var fillBmp:BitmapData = null;
         var fillRect:Rectangle = rc;
 
-        if(Std.is(data, BitmapData)) {
+        if((data is BitmapData)) {
             fillBmp = cast data;
         }
         #if svg
-        else if(Std.is(data, format.SVG)) {
+        else if((data is format.SVG)) {
             var svg:format.SVG = cast data;
             var renderer = new format.svg.SVGRenderer (svg.data);
             fillBmp = renderer.renderBitmap(rc);
@@ -195,7 +195,7 @@ class NMEStyleHelper {
             cacheId += "_" + BitmapCache.rectId(clip);
             var clipBmp:BitmapData = BitmapCache.instance.get(cacheId);
             if (clipBmp == null) {
-                clipBmp = new BitmapData(cast clip.width, cast clip.height, true, 0x00000000);
+                clipBmp = new BitmapData(Std.int(clip.width), Std.int(clip.height), true, 0x00000000);
                 clipBmp.copyPixels(fillBmp, clip, new Point(0, 0));
                 BitmapCache.instance.set(cacheId, clipBmp);
             }
@@ -291,10 +291,18 @@ class NMEStyleHelper {
         dstRect.bottom = Std.int(dstRect.bottom);
         dstRect.right = Std.int(dstRect.right);
 
+        if (srcRect.width <= 0 || srcRect.height <= 0) {
+            return;
+        }
+        
+        if (dstRect.width <= 0 || dstRect.height <= 0) {
+            return;
+        }
+        
         cacheId += "__" + BitmapCache.rectId(srcRect);
         var srcBmp:BitmapData = BitmapCache.instance.get(cacheId);
         if (srcBmp == null) {
-            srcBmp = new BitmapData(cast srcRect.width, cast srcRect.height, true, 0x00000000);
+            srcBmp = new BitmapData(Std.int(srcRect.width), Std.int(srcRect.height), true, 0x00000000);
             srcBmp.copyPixels(bmp, srcRect, new Point(0, 0));
             BitmapCache.instance.set(cacheId, srcBmp);
         } else {
